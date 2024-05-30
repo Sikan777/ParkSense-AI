@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "parksense-ai"
+version = "0.1.0"
+description = "Система управління паркуванням на основі моделі комп'ютерного зору"
+authors = ["Sikan777 <sikanbog@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+uvicorn = "^0.30.0"
+sqlalchemy = "^2.0.30"
+psycopg2-binary = "^2.9.9"
+python-multipart = "^0.0.9"
+pytesseract = "^0.3.10"
+opencv-python-headless = "^4.9.0.80"
+passlib = "^1.7.4"
+matplotlib = "^3.9.0"
+tensorflow = "^2.16.1"
+keras = "^3.3.3"
+nltk = "^3.8.1"
+scikit-learn = "^1.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
