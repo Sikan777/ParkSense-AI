@@ -1,10 +1,37 @@
-from fastapi import FastAPI
-from auth.routers import auth_router
-from parking.routers import parking_router
-from image_processing.routers import image_router
+import os
+from pathlib import Path
+import uvicorn
 
-app = FastAPI()
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 
-app.include_router(auth_router)
-app.include_router(parking_router)
-app.include_router(image_router)
+from src.database.db import get_db
+from src.routes import auth, users
+
+app = FastAPI(title="ParkSense AI", description="Welcome to ParkSense AI API",
+              swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"})
+
+BASE_DIR = Path(__file__).parent
+directory = BASE_DIR.joinpath("src").joinpath("static")
+app.mount("/static", StaticFiles(directory=directory), name="static")
+
+app.include_router(auth.router, prefix='/api', tags=['Authentication'])
+app.include_router(users.router, prefix='/api', tags=['Users'])
+
+
+@app.get("/api/healthchecker", tags=['Health checker'])
+async def healthchecker(db: AsyncSession = Depends(get_db)):
+    try:
+        result = await db.execute(text("SELECT 1"))
+        result = result.fetchone()
+        if result is None:
+            raise HTTPException(status_code=500, detail="Database is not configured correctly")
+        return {"message": "Welcome to FastAPI!"}
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Error connecting to the database")
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level="info")

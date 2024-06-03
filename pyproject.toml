@@ -1,28 +1,55 @@
 [tool.poetry]
 name = "parksense-ai"
 version = "0.1.0"
-description = "Система управління паркуванням на основі моделі комп'ютерного зору"
-authors = ["Sikan777 <sikanbog@gmail.com>"]
+description = ""
+authors = ["Maksim Nesterovskyi <maxwel842@gmail.com>", "Yuliia Didenko <yu_lyan@ukr.net>",
+           "Bogdan Sikan <sikanbog@gmail.com>", "Olga Tsuban <tsubanolga@gmail.com>",
+           "Yaroslav Vdovenko <hedgy85@hotmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
-fastapi = "^0.111.0"
-uvicorn = "^0.30.0"
-sqlalchemy = "^2.0.30"
-psycopg2-binary = "^2.9.9"
-python-multipart = "^0.0.9"
-pytesseract = "^0.3.10"
-opencv-python-headless = "^4.9.0.80"
-passlib = "^1.7.4"
-matplotlib = "^3.9.0"
-tensorflow = "^2.16.1"
-keras = "^3.3.3"
-nltk = "^3.8.1"
-scikit-learn = "^1.5.0"
+python = "^3.11"
+fastapi = "^0.108.0"
+uvicorn = {extras = ["standard"], version = "^0.25.0"}
+requests = "^2.31.0"
+pydantic = {extras = ["email"], version = "^2.5.3"}
+sqlalchemy = "^2.0.25"
+python-multipart = "^0.0.6"
+alembic = "^1.13.1"
+jinja2 = "^3.1.3"
+asyncpg = "^0.29.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+libgravatar = "^1.0.4"
+fastapi-mail = "^1.4.1"
+python-dotenv = "^1.0.1"
+fastapi-limiter = "^0.1.6"
+cloudinary = "^1.38.0"
+pytest-mock = "^3.12.0"
+qrcode = "^7.4.2"
+pillow = "^10.2.0"
+coverage = "^7.4.3"
 
 
+[tool.poetry.group.test.dependencies]
+pytest = "7.4.4"
+pytest-asyncio = "^0.23.4"
+httpx = "^0.26.0"
+aiosqlite = "^0.19.0"
+
+
+
+[tool.poetry.group.dev.dependencies]
+sphinx = "^7.2.6"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+testpaths = [
+    "tests", ]
+pythonpath = "."
+filterwarnings = "ignore::DeprecationWarning"
