@@ -11,9 +11,9 @@ sys.path.append(os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'ImageHub'
-copyright = '2024, Kostiantyn Gorishnyi, Yuliia Didenko, Maksim Nesterovskyi, Taras Barskyi'
-author = 'Kostiantyn Gorishnyi, Yuliia Didenko, Maksim Nesterovskyi, Taras Barskyi'
+project = 'ParkSense-AI'
+copyright = '2024, Olga Tsuban, Yuliia Didenko, Maksim Nesterovskyi, Bogdan Sikan, Yaroslav Vdovenko'
+author = 'Olga Tsuban, Yuliia Didenko, Maksim Nesterovskyi, Bogdan Sikan, Yaroslav Vdovenko'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
