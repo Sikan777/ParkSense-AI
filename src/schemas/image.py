@@ -1,7 +1,11 @@
-from datetime import datetime
-from typing import Optional, List
-from pydantic import BaseModel, Field
+from typing import Union
+from uuid import UUID
+
+from pydantic import BaseModel
 
 
 class ImageSchema(BaseModel):
-    pass
+    current_plate: str
+    url: str
+    cloudinary_public_id: str
+    history: Union[UUID, int]
