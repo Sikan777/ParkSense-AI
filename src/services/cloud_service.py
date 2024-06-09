@@ -3,7 +3,7 @@ import asyncio
 from cloudinary import uploader
 import cloudinary
 from cloudinary.exceptions import Error as CloudinaryError
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException
 from requests import TooManyRedirects
 from requests.exceptions import RequestException, Timeout, HTTPError
 
@@ -25,7 +25,7 @@ class CloudService:
         This allows us to handle errors in a consistent way across our application.
 
         :param err: Catch the error that is raised by the function
-        :return: An httpexception
+        :return: An http exception
         """
         if isinstance(err, CloudinaryError):
             raise HTTPException(status_code=500, detail=f"Cloudinary API error: {err}")
@@ -50,45 +50,34 @@ class CloudService:
             raise HTTPException(status_code=500, detail=f"Unexpected error: {err}")
 
     @staticmethod
-    async def upload_image(user_id: int, image_file: UploadFile, folder_path: str = None):
+    async def upload_image(image_file: bytes, folder_path: str = None):
         """
         The upload_image function uploads an image to the cloudinary server.
-            Args:
-                user_id (int): The id of the user who uploaded the image.
-                image_file (UploadFile): The file object containing information about
-                    the uploaded file, such as its name and size. This is a type defined by FastAPI.
 
-        :param user_id: int: Create a folder for each user in the cloudinary database
-        :param image_file: UploadFile: Upload the image file to cloudinary
+        :param image_file: bytes: Bytes object representing the image file
         :param folder_path: str: Specify the folder in which the image will be uploaded to
         :return: A tuple of the image url and public_id
         """
         try:
-            if not folder_path:
-                folder_path = f"ImageHubProjectDB/user_{user_id}/original_images"
-
-            response = await asyncio.to_thread(cloudinary.uploader.upload, image_file.file,
-                                               folder=folder_path)  # type: ignore
+            response = await asyncio.to_thread(cloudinary.uploader.upload, image_file,
+                                               folder=f"ParkSense-AI/{folder_path}")  # type: ignore
             return response['url'], response['public_id']
 
         except Exception as err:
             CloudService.handle_exceptions(err)
 
     @staticmethod
-    async def delete_picture(public_id: str):
+    async def delete_image(cloudinary_public_id: str):
         """
-        The delete_picture function is used to delete a picture from the Cloudinary cloud storage service.
+        The delete_image function is used to delete a picture from the Cloudinary cloud storage service.
             It takes in one parameter, public_id, which is the unique identifier of the image that will be deleted.
             The function uses asyncio and cloudinary to delete an image with a given public_id.
 
-        :param public_id: str: Identify the picture to be deleted
+        :param cloudinary_public_id: str: Identify the picture to be deleted
         :return: A dictionary with the following keys:
         """
         try:
-            await asyncio.to_thread(
-                cloudinary.uploader.destroy,
-                public_id
-            )
+            await asyncio.to_thread(cloudinary.uploader.destroy, cloudinary_public_id)
         except Exception as err:
             CloudService.handle_exceptions(err)
 
@@ -114,4 +103,3 @@ class CloudService:
 
         except Exception as err:
             CloudService.handle_exceptions(err)
-

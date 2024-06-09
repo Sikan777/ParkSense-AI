@@ -35,7 +35,6 @@ class UserUpdate(BaseModel):
 
 
 class UserProfile(BaseModel):
-    """Pydantic model for serializing simplified user data in responses."""
     username: str
     email: EmailStr
     phone_number: str

@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.db import get_db
 from src.entity.models import User, Role
 from src.schemas.user import UserModel, UserUpdate
+from src.services import auth
 
 
 async def create_user(body: UserModel, db: AsyncSession = Depends(get_db)):
