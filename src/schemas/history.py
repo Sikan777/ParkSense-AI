@@ -1,18 +1,8 @@
-from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Optional, Union
+from uuid import UUID
+# from sqlalchemy import func, DateTime
 
-class PlateBase(BaseModel):
-    plate_number: str
+from pydantic import BaseModel, Field
 
-class PlateCreate(PlateBase):
-    pass
 
-class PlateInDBBase(PlateBase):
-    id: int
-    registered_at: datetime
-
-    class Config:
-        orm_mode = True
-
-class Plate(PlateInDBBase):
-    pass
