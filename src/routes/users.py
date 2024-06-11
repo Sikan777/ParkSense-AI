@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.db import get_db
 from src.entity.models import User, Role
+from src.repository.car import CarRepository
+from src.schemas.car import NewCarResponse
 from src.schemas.user import UserResponse, UserProfile, UserUpdate
 from src.services.auth import auth_service
 from src.repository import users as repositories_users
@@ -84,3 +86,24 @@ async def ban_user(username: str, current_user: User = Depends(auth_service.get_
     return {"message": f"{username} has been banned."}
 
 
+@router.get("/cars/{user_id}", response_model=list[NewCarResponse], status_code=status.HTTP_200_OK)
+async def get_cars_by_user(user_id: int, db: AsyncSession = Depends(get_db),
+                           user: User = Depends(auth_service.get_current_user)):
+    """
+    Retrieves a list of cars for the specified user.
+
+    :param user_id: The ID of the user for whom to retrieve the cars.
+    :type user_id: int
+    :param db: Asynchronous database session (dependency injection).
+    :type db: AsyncSession
+    :param user: The currently authenticated user (dependency injection).
+    :type user: User
+    :raises HTTPException: If the user is not an admin and is trying to access data of another user, a 403 FORBIDDEN error is raised.
+    :return: A list of cars belonging to the specified user.
+    :rtype: list[NewCarResponse]
+    """
+    if user.role != Role.admin and user.id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
+    car_repository = CarRepository(db)
+    cars = await car_repository.get_cars_by_user(user_id)
+    return cars

@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class ImageSchema(BaseModel):
+class ImageModel(BaseModel):
     current_plate: str
     url: str
     cloudinary_public_id: str
