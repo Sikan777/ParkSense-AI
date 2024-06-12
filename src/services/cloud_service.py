@@ -103,3 +103,6 @@ class CloudService:
 
         except Exception as err:
             CloudService.handle_exceptions(err)
+
+
+cloud_service = CloudService()

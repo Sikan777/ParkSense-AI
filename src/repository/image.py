@@ -15,7 +15,7 @@ async def get_random_image_info(session: AsyncSession) -> Tuple[str, int]:
     return random_image.current_plate, random_image.id
 
 
-async def create_picture(session: AsyncSession, current_plate: str, url: str, cloudinary_public_id: str) -> Image:
+async def create_image(session: AsyncSession, current_plate: str, url: str, cloudinary_public_id: str) -> Image:
     image = Image(find_plate=current_plate, url=url, cloudinary_public_id=cloudinary_public_id)
     session.add(image)
     await session.commit()
