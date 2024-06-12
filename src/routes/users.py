@@ -107,3 +107,14 @@ async def get_cars_by_user(user_id: int, db: AsyncSession = Depends(get_db),
     car_repository = CarRepository(db)
     cars = await car_repository.get_cars_by_user(user_id)
     return cars
+
+@router.get("/cars/{plate}", response_model=NewCarResponse, status_code=status.HTTP_200_OK)
+async def get_car_by_plate(plate: str, db: AsyncSession = Depends(get_db),
+                           admin: User = Depends(auth_service.get_current_admin)):
+    if admin.role != Role.admin:
+        raise HTTPException(status_code=400, detail="Not authorized to access this resource")
+    car_repository = CarRepository(db)
+    car = await car_repository.get_car_by_plate(plate)
+    if car is None:
+        raise HTTPException(status_code=404, detail="Car not found")
+    return car
