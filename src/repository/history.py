@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from typing import Sequence, Tuple
-from sqlalchemy import func, or_, select
+from sqlalchemy import and_, desc, func, null, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.entity.models import History, ParkingRate
+from src.entity.models import Car, History, ParkingRate, User
 from src.repository.car import CarRepository
 
 #Implementing entry time recording every time a license plate is detected
@@ -121,3 +121,202 @@ async def get_history_entries_with_null_exit_time(session: AsyncSession) -> Sequ
     result = await session.execute(stmt)
     history_entries = result.unique().scalars().all()
     return history_entries
+
+
+#Getting and adding information about paid parking
+async def update_paid_history( plate: str,  paid: bool, session: AsyncSession):
+    statement = select(History).where(
+        and_(History.car.has(plate=plate), History.paid == False)
+    )
+    result = await session.execute(statement)
+    history_entry = result.unique().scalars().first()
+
+    if history_entry is None:
+        return None
+
+    history_entry.paid = paid
+
+    await session.commit()
+    await session.refresh(history_entry)
+    return history_entry
+
+#Getting information about unpaid parking
+async def get_history_entries_with_null_paid(session: AsyncSession) -> Sequence[History]:
+    query = select(History).filter(History.paid == False)
+    result = await session.execute(query)
+    history_entries = result.unique().scalars().all()
+    return history_entries
+
+
+###Additional functionality for getting different information
+async def get_history_entries_by_period(start_time: datetime, end_time: datetime, session: AsyncSession) -> Sequence[History]:
+
+    start_time = datetime.combine(start_time.date(), time.min)
+    end_time = datetime.combine(end_time.date(), time.max)
+
+    query = select(History).join(Car).filter(
+        History.entry_time.between(start_time, end_time)
+    )
+    result = await session.execute(query)
+    history_entries = result.unique().scalars().all()
+    return history_entries 
+
+
+async def get_history_entries_by_period_car (start_time: datetime, end_time: datetime, car_id: int, session: AsyncSession) -> Sequence[History]:
+    start_time = datetime.combine(start_time.date(), time.min)
+    end_time = datetime.combine(end_time.date(), time.max)
+
+    query = select(History).join(Car).filter(
+        History.entry_time.between(start_time, end_time),
+        History.car_id == car_id
+    )
+    result = await session.execute(query)
+    history_entries = result.unique().scalars().all()
+    return history_entries
+
+async def get_history_entries_with_null_car_id(session: AsyncSession) -> Sequence[History]:
+    query = select(History).filter(History.car_id == null())
+    result = await session.execute(query)
+    history_entries = result.unique().scalars().all()
+    return history_entries
+
+async def update_parking_spaces(session: AsyncSession) -> Tuple[int, int]:
+    history_entries = await get_history_entries_with_null_exit_time(session)
+    num_entries = len(history_entries)
+
+    latest_parking_rate = await get_latest_parking_rate(session)
+    latest_parking_rate_spaces = latest_parking_rate.number_of_spaces if latest_parking_rate else 0
+
+    number_free_spaces = latest_parking_rate_spaces - num_entries
+
+    if number_free_spaces == 0:
+        number_free_spaces = 100
+    rate_id = latest_parking_rate.id if latest_parking_rate else 0
+    return number_free_spaces, latest_parking_rate.id
+
+async def get_latest_parking_rate(session: AsyncSession):
+    query = select(ParkingRate).order_by(desc(ParkingRate.created_at)).limit(1)
+    result = await session.execute(query)
+    parking_rate = result.unique().scalar_one_or_none()
+    return parking_rate
+
+
+async def get_latest_parking_rate_with_free_spaces(session: AsyncSession):
+    query = select(History).order_by(desc(History.created_at)).limit(1)
+    result = await session.execute(query)
+    latest_entry = result.unique().scalar_one_or_none()
+    if latest_entry:
+        return f"free spaces -  {latest_entry.number_free_spaces}"
+    return "No data available"
+
+async def update_car_history( plate: str, car_id: int, session: AsyncSession):
+    statement = select(History).where(
+        and_(History.picture.has(find_plate=plate), History.car_id == null())
+    )
+    result = await session.execute(statement)
+    history_entry = result.unique().scalars().first()
+
+    if history_entry is None:
+        return None
+
+    history_entry.car_id = car_id
+
+    await session.commit()
+    await session.refresh(history_entry)
+    return history_entry
+
+
+### Limits of parking expenses with notification
+# async def check_expense_limits(user_id: int, session: AsyncSession):
+#     stmt = select(History).filter(History.car_id == user_id)
+#     result = await session.execute(stmt)
+#     histories = result.scalars().all()
+
+#     total_expense = sum(history.cost for history in histories if history.paid)
+    
+#     limit_stmt = select(ExpenseLimit).filter(ExpenseLimit.user_id == user_id)
+#     limit_result = await session.execute(limit_stmt)
+#     limit = limit_result.scalars().first()
+    
+#     if limit and total_expense > limit.limit_amount:
+#         if not limit.notification_sent:
+#             await send_notification(user_id, total_expense, limit.limit_amount)
+#             limit.notification_sent = True
+#             await session.commit()
+
+async def calculate_total_parking_cost(user_id: int, session: AsyncSession) -> float:
+    total_cost = await session.execute(
+        select(func.sum(History.cost)).where(History.car_id == Car.id, Car.user_id == user_id)
+    )
+    return total_cost.scalar() or 0.0
+
+async def check_parking_limit_and_notify(user_id: int, session: AsyncSession):
+    user = await session.get(User, user_id)
+    if not user:
+        return
+
+    total_cost = await calculate_total_parking_cost(user_id, session)
+    if total_cost > user.parking_limit:
+        await send_notification(user.email, total_cost, user.parking_limit)
+
+async def send_notification(email: str, total_cost: float, limit: float):
+    subject = "Превышение лимита расходов на парковку"
+    message = f"Ваши текущие расходы на парковку составляют {total_cost}, что превышает установленный лимит {limit}."
+    send_email(email, subject, message)
+    
+###SEND EMAIL example SMTPLIB
+
+# import smtplib
+# from email.mime.multipart import MIMEMultipart
+# from email.mime.text import MIMEText
+
+# async def send_email(to_email: str, subject: str, body: str):
+#     from_email = "your_email@example.com"
+#     from_password = "your_email_password"
+#     smtp_server = "smtp.example.com"
+#     smtp_port = 587
+
+#     msg = MIMEMultipart()
+#     msg['From'] = from_email
+#     msg['To'] = to_email
+#     msg['Subject'] = subject
+
+#     msg.attach(MIMEText(body, 'plain'))
+
+#     try:
+#         server = smtplib.SMTP(smtp_server, smtp_port)
+#         server.starttls()
+#         server.login(from_email, from_password)
+#         server.sendmail(from_email, to_email, msg.as_string())
+#         server.quit()
+#         print("Email sent successfully")
+#     except Exception as e:
+#         print(f"Failed to send email: {e}")
+
+###SEND EMAIL example FASTAPI_MAIL
+# from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+
+# conf = ConnectionConfig(
+#     MAIL_USERNAME="your_email@example.com",
+#     MAIL_PASSWORD="your_email_password",
+#     MAIL_FROM="your_email@example.com",
+#     MAIL_PORT=587,
+#     MAIL_SERVER="smtp.example.com",
+#     MAIL_TLS=True,
+#     MAIL_SSL=False,
+#     USE_CREDENTIALS=True
+# )
+
+# async def send_email(to_email: str, subject: str, body: str):
+#     message = MessageSchema(
+#         subject=subject,
+#         recipients=[to_email],  # List of recipients
+#         body=body,
+#         subtype="plain"
+#     )
+
+#     fm = FastMail(conf)
+#     await fm.send_message(message)
+
+
+
