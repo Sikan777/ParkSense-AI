@@ -260,8 +260,8 @@ async def check_parking_limit_and_notify(user_id: int, session: AsyncSession):
         await send_notification(user.email, total_cost, user.parking_limit)
 
 async def send_notification(email: str, total_cost: float, limit: float):
-    subject = "Превышение лимита расходов на парковку"
-    message = f"Ваши текущие расходы на парковку составляют {total_cost}, что превышает установленный лимит {limit}."
+    subject = "Parking Expense Limit Exceeded"
+    message = f"Your current parking expenses amount to {total_cost}, which exceeds the established limit {limit}."
     #send_email(email, subject, message)
     
 ###SEND EMAIL example SMTPLIB
