@@ -256,7 +256,7 @@ async def check_parking_limit_and_notify(user_id: int, session: AsyncSession):
         return
 
     total_cost = await calculate_total_parking_cost(user_id, session)
-    if total_cost > user.parking_limit:
+    if total_cost > user.parking_expenses_limit:
         await send_notification(user.email, total_cost, user.parking_limit)
 
 async def send_notification(email: str, total_cost: float, limit: float):
