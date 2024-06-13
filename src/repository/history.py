@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-from typing import Sequence
+from typing import Sequence, Tuple
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.entity.models import History
+from src.entity.models import History, ParkingRate
 from src.repository.car import CarRepository
 
-
+#Implementing entry time recording every time a license plate is detected
 async def create_entry(find_plate: str, image_id: int, session: AsyncSession) -> History:
     entry_time = datetime.now()
     # number_free_spaces,rate_id = await update_parking_spaces(session)
@@ -35,7 +35,7 @@ async def create_entry(find_plate: str, image_id: int, session: AsyncSession) ->
     await session.refresh(history_new)
     return history_new
 
-
+#Implementing exit time recording every time a license plate is detected
 async def create_exit(find_plate: str, image_id: int, session: AsyncSession):
     history_entries = await get_history_entries_with_null_exit_time(session)
     # number_free_spaces, rate_id = await update_parking_spaces(session)
@@ -54,23 +54,26 @@ async def create_exit(find_plate: str, image_id: int, session: AsyncSession):
                 # history.number_free_spaces = number_free_spaces
                 # history.rate_id = rate_id
 
-                # rate_per_hour, rate_per_day = await get_parking_rates_for_date(history.entry_time, session)
+                #to the calculation of the cost of parking (using parking rate values)(class ParkingRate from the module category)
+                rate_per_hour, rate_per_day = await get_parking_rates_for_date(history.entry_time, session)
 
+                #Implementing parking duration tracking
                 duration_hours = await calculate_parking_duration(history.entry_time, history.exit_time)
 
-                # if duration_hours > 24:
-                #     cost = await calculate_parking_cost(duration_hours, rate_per_day)
-                # else:
-                #     cost = await calculate_parking_cost(duration_hours, rate_per_hour)
+                #the calculation of the cost of parking
+                if duration_hours > 24:
+                    cost = await calculate_parking_cost(duration_hours, rate_per_day)
+                else:
+                    cost = await calculate_parking_cost(duration_hours, rate_per_hour)
 
-                history.parking_time = duration_hours
-                #history.cost = cost
+                history.parking_time = duration_hours  #duration of parking
+                history.cost = cost #the calculation of the cost of parking
 
-                # car_row.credit -= cost
+                car_row.credit -= cost #the calculation of the cost of parking
                 session.add(car_row)
 
-                # if car_row.credit >= 0:
-                #     history.paid = True
+                if car_row.credit >= 0:
+                    history.paid = True #the calculation of the cost of parking
 
                 await session.commit()
                 await session.refresh(history)
@@ -86,10 +89,30 @@ async def create_exit(find_plate: str, image_id: int, session: AsyncSession):
 
     return None
 
+#Implementing parking duration tracking
 async def calculate_parking_duration(entry_time: datetime, exit_time: datetime) -> float:
     duration = exit_time - entry_time
     hours = duration / timedelta(hours=1)
     return round(hours, 2)
+
+#the calculation of the cost of parking
+async def calculate_parking_cost(duration_hours: float, rate_per_hour: float) -> float:
+    cost = round(duration_hours * rate_per_hour, 2)
+    return cost
+
+#to the calculation of the cost of parking (using parking rate values)(class ParkingRate from the module category)
+async def get_parking_rates_for_date(entry_time: datetime, session: AsyncSession) -> Tuple[float, float]:
+    rates = await session.execute(
+        select(ParkingRate).filter(ParkingRate.created_at <= entry_time)
+        .order_by(ParkingRate.created_at.desc()).limit(1)
+    )
+    rate_row = rates.scalars().first()
+    if rate_row:
+        return rate_row.rate_per_hour, rate_row.rate_per_day
+    else:
+        default_rate_per_hour = ParkingRate.rate_per_hour.default.arg
+        default_rate_per_day = ParkingRate.rate_per_day.default.arg
+        return default_rate_per_hour, default_rate_per_day
 
 async def get_history_entries_with_null_exit_time(session: AsyncSession) -> Sequence[History]:
 
