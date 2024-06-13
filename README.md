@@ -1,4 +1,4 @@
-# ImageHub
+# ParkSense-AI
 
 <p align="center">
   <img src="http://res.cloudinary.com/dyhtnkitj/image/upload/v1709056165/ImageHubProjectDB/user_1/original_images/ttu63ajzijfgp7ydjinm.jpg"
@@ -7,7 +7,7 @@
 
 ---
 
-ImageHub is a REST API application implemented using the FastAPI framework.
+ParkSense is a REST API application implemented using the FastAPI framework.
 It allows users to upload, manage, and share photos, and interact through comments.
 
 ---
@@ -41,6 +41,7 @@ It allows users to upload, manage, and share photos, and interact through commen
 | [Passlib](https://passlib.readthedocs.io/en/stable/) | Password hashing   |
 | [Qrcode](https://pypi.org/project/qrcode/)           | QR code generator  |
 | [Pillow](https://pypi.org/project/Pillow/)           | Image processing   |
+|                                  |
 
 ---
 
@@ -188,7 +189,7 @@ _and fill in the information you need, run the docker container and create the d
 
 - [Documentation](http://localhost:63342/ImageHub/docs/_build/html/index.html?_ijt=bievmo05hld2bt65j03j40vh49&_ij_reload=RELOAD_ON_SAVE)
 - [Swagger documentation](http://127.0.0.1:8000/docs#)
-- [GitHub](https://github.com/Kostiantyn78/ImageHub)
+- [GitHub](https://github.com/Sikan777/ParkSense-AI)
 - [Live example](https://imagehub-54rh.onrender.com/docs#)
 
 ---
@@ -205,7 +206,8 @@ The **PyCrafters** Team:
 
 - [Yuliia Didenko](https://github.com/yulyan407)
 - [Maksim Nesterovskyi](https://github.com/legendarym4x)
-- [Kostiantyn Gorishnyi](https://github.com/Kostiantyn78)
-- [Taras Barskyi](https://github.com/Barskyi)
+- [Olga Tsuban](https://github.com/OlgaTsuban)
+- [Bohdan Sikan](https://github.com/Sikan777)
+- [Yaroslav Vdovenko](https://github.com/hedgyv)
 
 ---

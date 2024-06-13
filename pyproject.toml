@@ -33,6 +33,8 @@ keras = "^3.3.3"
 tensorflow = "^2.16.1"
 matplotlib = "^3.9.0"
 opencv-python-headless = "^4.10.0.82"
+argparse = "^1.4.0"
+easyocr = "^1.7.1"
 
 
 [tool.poetry.group.test.dependencies]
