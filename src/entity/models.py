@@ -105,7 +105,7 @@ class History(JoinTime, Base):
 
     car: Mapped["Car"] = relationship("Car", back_populates="history", lazy="joined",
                                       cascade="all, delete")
-    picture: Mapped["Image"] = relationship("Image", back_populates="history", lazy="joined",
+    image: Mapped["Image"] = relationship("Image", back_populates="history", lazy="joined",
                                             cascade="all, delete")
     rates: Mapped["ParkingRate"] = relationship("ParkingRate", back_populates="history", lazy="joined",
                                                 cascade="all, delete")
