@@ -4,6 +4,7 @@ from sqlalchemy import and_, desc, func, null, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.entity.models import Car, History, ParkingRate, User
 from src.repository.car import CarRepository
+from src.services.email import send_email
 
 #Implementing entry time recording every time a license plate is detected
 async def create_entry(find_plate: str, image_id: int, session: AsyncSession) -> History:
@@ -262,7 +263,7 @@ async def check_parking_limit_and_notify(user_id: int, session: AsyncSession):
 async def send_notification(email: str, total_cost: float, limit: float):
     subject = "Parking Expense Limit Exceeded"
     message = f"Your current parking expenses amount to {total_cost}, which exceeds the established limit {limit}."
-    #send_email(email, subject, message)
+    send_email(email, subject, message)
     
 ###SEND EMAIL example SMTPLIB
 
