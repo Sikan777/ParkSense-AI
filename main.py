@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
 from src.database.db import get_db
-from src.routes import auth, users
+from src.routes import auth, users, history
 
 app = FastAPI(title="ParkSense AI", description="Welcome to ParkSense AI API",
               swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"})
@@ -19,8 +19,12 @@ app.mount("/static", StaticFiles(directory=directory), name="static")
 
 app.include_router(auth.router, prefix='/api', tags=['Authentication'])
 app.include_router(users.router, prefix='/api', tags=['Users'])
+
 # app.include_router(admin.router, prefix='/api', tags=['Admin'])
 # app.include_router(image.router, prefix='/api', tags=['Images'])
+
+app.include_router(history.router, prefix='/api', tags=['History'])
+
 
 
 @app.get("/api/healthchecker", tags=['Health checker'])
