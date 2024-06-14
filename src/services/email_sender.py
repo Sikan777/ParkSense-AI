@@ -53,11 +53,11 @@ conf = ConnectionConfig(
     VALIDATE_CERTS=True
 )
 
-async def send_email():
+async def send_email(to_email: str, subject: str, body: str):
     message = MessageSchema(
-        subject='Parking expenses',
-        recipients=['hedgy85@ukr.net'],  # List of recipients
-        body="Your current parking expenses amount to 1200$, which exceeds the established limit 1000$.",
+        subject=subject,
+        recipients=[to_email],  # List of recipients
+        body=body,
         subtype="plain"
     )
 
