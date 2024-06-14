@@ -4,7 +4,7 @@ from sqlalchemy import and_, desc, func, null, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.entity.models import Car, History, ParkingRate, User
 from src.repository.car import CarRepository
-from src.services.email import send_email
+from src.services.email_sender import send_email
 
 #Implementing entry time recording every time a license plate is detected
 async def create_entry(find_plate: str, image_id: int, session: AsyncSession) -> History:
