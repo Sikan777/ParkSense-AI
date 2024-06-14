@@ -19,6 +19,8 @@ app.mount("/static", StaticFiles(directory=directory), name="static")
 
 app.include_router(auth.router, prefix='/api', tags=['Authentication'])
 app.include_router(users.router, prefix='/api', tags=['Users'])
+# app.include_router(admin.router, prefix='/api', tags=['Admin'])
+# app.include_router(image.router, prefix='/api', tags=['Images'])
 
 
 @app.get("/api/healthchecker", tags=['Health checker'])
