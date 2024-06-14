@@ -4,7 +4,7 @@ import asynctempfile
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from DS.funcs_repo.image_process_async import plate_recognize
+from DS.functions.image_process import plate_recognize
 from src.database.db import get_db
 from src.entity.models import User
 from src.repository.history import create_entry, create_exit
