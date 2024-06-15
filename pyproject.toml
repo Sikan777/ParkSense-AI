@@ -6,6 +6,7 @@ authors = ["Maksim Nesterovskyi <maxwel842@gmail.com>", "Yuliia Didenko <yu_lyan
            "Bogdan Sikan <sikanbog@gmail.com>", "Olga Tsuban <tsubanolga@gmail.com>",
            "Yaroslav Vdovenko <hedgy85@hotmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "3.11.2"
