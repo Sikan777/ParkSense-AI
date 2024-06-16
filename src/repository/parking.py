@@ -12,6 +12,14 @@ async def create_rate(session: AsyncSession, body: ParkingRateSchema) -> Parking
     await session.refresh(new_rate)
     return new_rate
 
+async def get_default_rate_values(session: AsyncSession):
+    latest_rate = await session.execute(
+        select(ParkingRate)
+        .order_by(ParkingRate.created_at.desc())
+        .limit(1)
+    )
+    latest_rate = latest_rate.scalars().first()
+    return latest_rate
 
 async def get_latest_rate(session: AsyncSession):
     latest_rate = await session.execute(
