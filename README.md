@@ -1,4 +1,4 @@
-# ImageHub
+# ParkSense-AI 
 
 <p align="center">
   <img src="http://res.cloudinary.com/dyhtnkitj/image/upload/v1709056165/ImageHubProjectDB/user_1/original_images/ttu63ajzijfgp7ydjinm.jpg"
@@ -7,8 +7,7 @@
 
 ---
 
-ImageHub is a REST API application implemented using the FastAPI framework.
-It allows users to upload, manage, and share photos, and interact through comments.
+ParkSense-AI is a web application designed to automate the detection of vehicle license plates in images, track parking duration for each unique vehicle, and calculate accumulated parking fees.
 
 ---
 
@@ -39,8 +38,11 @@ It allows users to upload, manage, and share photos, and interact through commen
 | [PostgreSQL](https://www.postgresql.org/)            | Database           |
 | [Cloudinary](https://cloudinary.com/)                | Image hosting      |
 | [Passlib](https://passlib.readthedocs.io/en/stable/) | Password hashing   |
-| [Qrcode](https://pypi.org/project/qrcode/)           | QR code generator  |
 | [Pillow](https://pypi.org/project/Pillow/)           | Image processing   |
+| [Tensorflow](https://www.tensorflow.org/guide/tensor)| Machine learning   |
+| [OpenCV](https://docs.opencv.org/4.x/)               | Computer vision    |
+| [Easyocr](https://github.com/JaidedAI/EasyOCR)       | Optical character recognition   |
+
 
 ---
 
@@ -155,7 +157,7 @@ administrators can perform all CRUD operations with user photos.
 - Clone the repository.
 
 ```Shell
-  git clone https://github.com/Kostiantyn78/ImageHub.git
+  git clone https://github.com/Sikan777/ParkSense-AI.git
 ```
 
 - Install dependencies.
@@ -186,10 +188,10 @@ _and fill in the information you need, run the docker container and create the d
 
 ### Additional information
 
-- [Documentation](http://localhost:63342/ImageHub/docs/_build/html/index.html?_ijt=bievmo05hld2bt65j03j40vh49&_ij_reload=RELOAD_ON_SAVE)
+
 - [Swagger documentation](http://127.0.0.1:8000/docs#)
-- [GitHub](https://github.com/Kostiantyn78/ImageHub)
-- [Live example](https://imagehub-54rh.onrender.com/docs#)
+- [GitHub](https://github.com/Sikan777/ParkSense-AI.git)
+
 
 ---
 
@@ -205,7 +207,8 @@ The **PyCrafters** Team:
 
 - [Yuliia Didenko](https://github.com/yulyan407)
 - [Maksim Nesterovskyi](https://github.com/legendarym4x)
-- [Kostiantyn Gorishnyi](https://github.com/Kostiantyn78)
-- [Taras Barskyi](https://github.com/Barskyi)
+- [Olga Tsuban](https://github.com/OlgaTsuban)
+- [Yaroslav Vdovenko](https://github.com/hedgyv)
+- [Bohdan Sikan](https://github.com/Sikan777)
 
 ---
