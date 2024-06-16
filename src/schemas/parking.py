@@ -1,5 +1,6 @@
 from typing import Optional, Union
 from uuid import UUID
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -22,6 +23,16 @@ class NewParkingRateSchema(BaseModel):
 
 class ParkingRateSchema(BaseModel):
     """Pydantic model for validating incoming ParkingRate data."""
+    rate_per_hour: float
+    rate_per_day: float
+    number_of_spaces: int = Field(default=50, nullable=True)
+
+
+class ParkingRateResponse(BaseModel):
+    """Pydantic model for serializing ParkingRate data in responses."""
+    id: int
+    created_at: datetime
+    updated_at: datetime
     rate_per_hour: float
     rate_per_day: float
     number_of_spaces: int = Field(default=50, nullable=True)
