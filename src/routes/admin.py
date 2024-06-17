@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.db import get_db
 from src.entity.models import User, Role
 from src.repository.car import CarRepository
-# from src.repository.parking import create_rate, create_or_update_rate, get_default_rate_values
+from src.repository.parking import create_rate, create_or_update_rate, get_default_rate_values
 from src.schemas.user import UserResponse
 from src.schemas.car import CarModel, CarUpdate, NewCarResponse
-# from src.schemas.parking import ParkingRateSchema, NewParkingRateSchema
+from src.schemas.parking import ParkingRateSchema, NewParkingRateSchema
 from src.services.auth import auth_service
 
 router = APIRouter(prefix="/admin", tags=["Admin"])

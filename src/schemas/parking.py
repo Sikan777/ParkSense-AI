@@ -36,3 +36,5 @@ class ParkingRateResponse(BaseModel):
     rate_per_hour: float
     rate_per_day: float
     number_of_spaces: int = Field(default=50, nullable=True)
+    
+    

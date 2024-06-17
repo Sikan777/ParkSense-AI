@@ -18,17 +18,17 @@ from src.repository.car import CarRepository
 router = APIRouter(prefix="/history", tags=["History"])
 
 
-@router.get("/create_entry/{find_plate}/{picture_id}", response_model=HistoryUpdate)
-async def create_entry(find_plate, picture_id, session: AsyncSession = Depends(get_db)):
-    history = await repositories_history.create_entry(find_plate, picture_id, session)
+@router.get("/create_entry/{find_plate}/{image_id}", response_model=HistoryUpdate)
+async def create_entry(find_plate, image_id, session: AsyncSession = Depends(get_db)):
+    history = await repositories_history.create_entry(find_plate, image_id, session)
     if history is None:
         raise HTTPException(status_code=400, detail="Error creating entry car")
     return history
 
 
-@router.get("/create_exit/{find_plate}/{picture_id}", response_model=HistoryUpdate)
-async def create_exit(find_plate, picture_id, session: AsyncSession = Depends(get_db)):
-    history = await repositories_history.create_exit(find_plate, picture_id, session)
+@router.get("/create_exit/{find_plate}/{image_id}", response_model=HistoryUpdate)
+async def create_exit(find_plate, image_id, session: AsyncSession = Depends(get_db)):
+    history = await repositories_history.create_exit(find_plate, image_id, session)
     if history is None:
         raise HTTPException(status_code=400, detail="Error creating exit car")
     return history

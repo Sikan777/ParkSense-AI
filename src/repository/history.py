@@ -9,8 +9,8 @@ from src.services.email_sender import send_email
 #Implementing entry time recording every time a license plate is detected
 async def create_entry(find_plate: str, image_id: int, session: AsyncSession) -> History:
     entry_time = datetime.now()
-    # number_free_spaces,rate_id = await update_parking_spaces(session)
-    # number_free_spaces -= 1
+    number_free_spaces, rate_id = await update_parking_spaces(session)
+    number_free_spaces -= 1
     
 
     car_repository = CarRepository(session)
@@ -21,7 +21,7 @@ async def create_entry(find_plate: str, image_id: int, session: AsyncSession) ->
     else:
 
         history_new = History(entry_time=entry_time, image_id=image_id,
-                              #number_free_spaces=number_free_spaces, rate_id=rate_id,
+                              number_free_spaces=number_free_spaces, rate_id=rate_id,
                       exit_time=None)
         session.add(history_new)
         await session.commit()
@@ -29,7 +29,7 @@ async def create_entry(find_plate: str, image_id: int, session: AsyncSession) ->
         return history_new
 
     history_new = History(entry_time=entry_time, car_id=car_id, image_id=image_id,
-                          #number_free_spaces=number_free_spaces, rate_id=rate_id,
+                          number_free_spaces=number_free_spaces, rate_id=rate_id,
                       exit_time=None)
     session.add(history_new)
     await session.commit()
@@ -39,9 +39,9 @@ async def create_entry(find_plate: str, image_id: int, session: AsyncSession) ->
 #Implementing exit time recording every time a license plate is detected
 async def create_exit(find_plate: str, image_id: int, session: AsyncSession):
     history_entries = await get_history_entries_with_null_exit_time(session)
-    # number_free_spaces, rate_id = await update_parking_spaces(session)
-    # number_free_spaces += 1
-    # rate_id=int(rate_id)
+    number_free_spaces, rate_id = await update_parking_spaces(session)
+    number_free_spaces += 1
+    rate_id=int(rate_id)
     image_id = int(image_id)
 
     exit_time = datetime.now()
@@ -52,8 +52,8 @@ async def create_exit(find_plate: str, image_id: int, session: AsyncSession):
             if history.car_id == car_row.id:
 
                 history.exit_time = exit_time
-                # history.number_free_spaces = number_free_spaces
-                # history.rate_id = rate_id
+                history.number_free_spaces = number_free_spaces
+                history.rate_id = rate_id
 
                 #to the calculation of the cost of parking (using parking rate values)(class ParkingRate from the module category)
                 rate_per_hour, rate_per_day = await get_parking_rates_for_date(history.entry_time, session)
@@ -212,7 +212,7 @@ async def get_latest_parking_rate_with_free_spaces(session: AsyncSession):
 
 async def update_car_history( plate: str, car_id: int, session: AsyncSession):
     statement = select(History).where(
-        and_(History.picture.has(find_plate=plate), History.car_id == null())
+        and_(History.image.has(find_plate=plate), History.car_id == null())
     )
     result = await session.execute(statement)
     history_entry = result.unique().scalars().first()
