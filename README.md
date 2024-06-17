@@ -15,10 +15,6 @@ ParkSense-AI is a web application designed to automate the detection of vehicle 
 
 - [Technologies](#technologies)
 - [Basic functionality](#basic-functionality)
-  - [Authentication](#authentication)
-  - [Working with photos](#working-with-photos)
-  - [Comments](#comments)
-  - [Profile](#profile)
 - [Usage](#usage)
   - [Installation](#installation)
   - [Additional information](#additional-information)
