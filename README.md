@@ -47,106 +47,95 @@ ParkSense-AI is a web application designed to automate the detection of vehicle 
 ---
 
 ## Basic functionality
+## Authentication
 
-### Authentication
+### POST /api/auth/signup
+Signup a new user.
 
-**Endpoints:**
+### POST /api/auth/login
+Login an existing user.
 
-```
-POST /api/auth/signup
-```
+### GET /api/auth/refresh_token
+Refresh the authentication token.
 
-```
-POST /api/auth/login
-```
+### POST /api/auth/logout
+Logout the current user.
 
-```
-GET /api/auth/refresh_token
-```
+## Users
 
-```
-GET /api/auth/confirmed_email/{token}
-```
+### GET /api/users/me
+Get the current user's profile.
 
-```
-POST /api/auth/request_email
-```
+### PATCH /api/users/me
+Update the current user's profile.
 
-The application uses JWT tokens for authentication. Users have three roles: regular user, moderator, and administrator.
+### GET /api/users/{username}
+Get a user's profile by username.
 
-To implement different access levels (regular user, moderator, and administrator),
-FastAPI decorators are used to check the token and user role.
+### PATCH /api/users/admin/{username}/ban
+Ban a user by username (Admin only).
 
-### Working with photos
+### GET /api/users/cars/{user_id}
+Get cars associated with a user by user ID.
 
-**Users can perform various operations related to photos:**
+### GET /api/users/cars/{plate}
+Get a car by its license plate.
 
-- Upload photos with descriptions.
-  ```
-  POST /api/images/upload_image
-  ```
-- Delete photos.
-  ```
-  DELETE /api/images/{picture_id}
-  ```
-- Edit photo descriptions.
-  ```
-  PATCH /api/images/{picture_id}
-  ```
-- Retrieve a photo by a unique link.
-  ```
-  GET /api/images/{picture_id}
-  ```
-- Add up to 5 tags per photo.
+## Admin
 
-- Apply basic photo transformations using
-  [Cloudinary services](https://cloudinary.com/documentation/image_transformations).
-  `  POST /api/transform/create_transform/{natural_photo_id}`
-- Generate links to transformed images for viewing as URL and QR-code. Links are stored on the server.
+### GET /api/admin/cars
+Retrieve a list of all cars.
 
-With the help of [FastAPI decorators, described above](#authentication),
-administrators can perform all CRUD operations with user photos.
+### POST /api/admin/cars
+Add a new car.
 
-### Comments
+### GET /api/admin/default-parking-rate
+Get the default parking rate.
 
-**Under each photo, there is a comment section. Users can:**
+### POST /api/admin/parking-rates
+Create or update a parking rate.
 
-- Add and read comments to each other's photos.
-  ```
-  POST /api/comments/{image_id}
-  ```
-  ```
-  GET /api/comments/all/{image_id}
-  ```
-- Edit comment.
-  ```
-  PATCH /api/comments/{comment_id}
-  ```
-- Administrators and moderators [if you have the role](#authentication) can delete comments.
-  ```
-  DELETE /api/comments/{comment_id}
-  ```
+### GET /api/admin/cars/parked
+Retrieve a list of currently parked cars.
 
-### Profile
+### GET /api/admin/cars/{plate}
+Retrieve information about a car by its license plate.
 
-**Endpoints for user profile:**
+### PATCH /api/admin/cars/{plate}
+Update a car's information by its license plate.
 
-- See your profile.
-  ```
-  GET /api/users/me
-  ```
-- Change your avatar.
-  ```
-  PATCH /api/users/avatar
-  ```
-- See another user's profile.
+### DELETE /api/admin/cars/{plate}
+Delete a car by its license plate.
 
-  ```
-  GET /api/users/{username}
-  ```
+### GET /api/admin/users-by-car/{plate}
+Retrieve users associated with a car by its license plate.
 
-- Create a route for a user profile based on their unique username.
-  It returns all user information, including name, registration date, and the number of uploaded photos.
+### PATCH /api/admin/cars/{plate}/ban
+Ban a car by its license plate.
+
+## Images
+
+### POST /api/parking/entry
+Register a parking entry event.
+
+### POST /api/parking/exit
+Register a parking exit event.
+
+## Parking
+
+### POST /api/parking/entry
+Register a parking entry event.
+
+### POST /api/parking/exit
+Register a parking exit event.
+
+## Parking-Rate
+
+### GET /api/parking-rate/free-spaces
+Get the latest parking rate with available free spaces.
+
+### POST /api/parking-rate/new-parking-rate
+Create a new parking rate.
 
 ---
 
@@ -158,6 +147,12 @@ administrators can perform all CRUD operations with user photos.
 
 ```Shell
   git clone https://github.com/Sikan777/ParkSense-AI.git
+```
+
+- Run docker file.
+
+```Shell
+  docker run --name ParkSense-AI -p 5432:5432 -e POSTGRES_PASSWORD=pass -d postgres
 ```
 
 - Install dependencies.
@@ -173,8 +168,13 @@ _using poetry_
 ```Shell
   cp .env.example .env
 ```
+- We create a database in DBeaver with the appropriate name and password located in the .env file
 
-_and fill in the information you need, run the docker container and create the database if use Postgres _
+- Update migrations
+
+```Shell
+  alembic upgrade head
+```
 
 - Run the application.
 
@@ -182,7 +182,9 @@ _and fill in the information you need, run the docker container and create the d
   uvicorn main:app --reload
 ```
 
-- Enjoy using application via link in the terminal.
+- Access the API documentation at `http://127.0.0.1:8000/docs#/ after starting the development server.
+
+- Use the provided endpoints to manage users, cars, and parking rates.
 
 ---
 
