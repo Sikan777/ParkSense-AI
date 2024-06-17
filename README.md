@@ -47,95 +47,148 @@ ParkSense-AI is a web application designed to automate the detection of vehicle 
 ---
 
 ## Basic functionality
+
 ## Authentication
 
-### POST /api/auth/signup
-Signup a new user.
+### Signup
+**Endpoint:** `POST /api/auth/signup`
 
-### POST /api/auth/login
-Login an existing user.
+Registers a new user.
 
-### GET /api/auth/refresh_token
-Refresh the authentication token.
+### Login
+**Endpoint:** `POST /api/auth/login`
 
-### POST /api/auth/logout
-Logout the current user.
+Authenticates a user and returns a token.
+
+### Refresh Token
+**Endpoint:** `GET /api/auth/refresh_token`
+
+Refreshes the authentication token.
+
+### Logout
+**Endpoint:** `POST /api/auth/logout`
+
+Logs out the authenticated user.
 
 ## Users
 
-### GET /api/users/me
-Get the current user's profile.
+### Get Current User
+**Endpoint:** `GET /api/users/me`
 
-### PATCH /api/users/me
-Update the current user's profile.
+Retrieves the profile of the currently authenticated user.
 
-### GET /api/users/{username}
-Get a user's profile by username.
+### Update Profile
+**Endpoint:** `PATCH /api/users/me`
 
-### PATCH /api/users/admin/{username}/ban
-Ban a user by username (Admin only).
+Updates the profile of the currently authenticated user.
 
-### GET /api/users/cars/{user_id}
-Get cars associated with a user by user ID.
+### Get User Profile
+**Endpoint:** `GET /api/users/{username}`
 
-### GET /api/users/cars/{plate}
-Get a car by its license plate.
+Retrieves the profile of a user by their username.
+
+### Ban User
+**Endpoint:** `PATCH /api/users/admin/{username}/ban`
+
+Bans a user by their username (Admin only).
+
+### Get Cars By User
+**Endpoint:** `GET /api/users/cars/{user_id}`
+
+Retrieves all cars associated with a specific user.
+
+### Get Car By Plate
+**Endpoint:** `GET /api/users/cars/{plate}`
+
+Retrieves a car by its plate number.
 
 ## Admin
 
-### GET /api/admin/cars
-Retrieve a list of all cars.
+### Read Cars
+**Endpoint:** `GET /api/admin/cars`
 
-### POST /api/admin/cars
-Add a new car.
+Retrieves a list of all cars (Admin only).
 
-### GET /api/admin/default-parking-rate
-Get the default parking rate.
+### Create Car
+**Endpoint:** `POST /api/admin/cars`
 
-### POST /api/admin/parking-rates
-Create or update a parking rate.
+Creates a new car entry (Admin only).
 
-### GET /api/admin/cars/parked
-Retrieve a list of currently parked cars.
+### Get Default Parking Rate
+**Endpoint:** `GET /api/admin/default-parking-rate`
 
-### GET /api/admin/cars/{plate}
-Retrieve information about a car by its license plate.
+Retrieves the default parking rate.
 
-### PATCH /api/admin/cars/{plate}
-Update a car's information by its license plate.
+### Create Or Update Parking Rate
+**Endpoint:** `POST /api/admin/parking-rates`
 
-### DELETE /api/admin/cars/{plate}
-Delete a car by its license plate.
+Creates or updates a parking rate (Admin only).
 
-### GET /api/admin/users-by-car/{plate}
-Retrieve users associated with a car by its license plate.
+### Read Parked Cars
+**Endpoint:** `GET /api/admin/cars/parked`
 
-### PATCH /api/admin/cars/{plate}/ban
-Ban a car by its license plate.
+Retrieves a list of all currently parked cars (Admin only).
+
+### Read Car
+**Endpoint:** `GET /api/admin/cars/{plate}`
+
+Retrieves a car by its plate number (Admin only).
+
+### Update Car
+**Endpoint:** `PATCH /api/admin/cars/{plate}`
+
+Updates a car entry by its plate number (Admin only).
+
+### Delete Car
+**Endpoint:** `DELETE /api/admin/cars/{plate}`
+
+Deletes a car entry by its plate number (Admin only).
+
+### Read Users By Car
+**Endpoint:** `GET /api/admin/users-by-car/{plate}`
+
+Retrieves a list of users associated with a specific car (Admin only).
+
+### Ban Car
+**Endpoint:** `PATCH /api/admin/cars/{plate}/ban`
+
+Bans a car by its plate number (Admin only).
 
 ## Images
 
-### POST /api/parking/entry
-Register a parking entry event.
+### Park Entry
+**Endpoint:** `POST /api/parking/entry`
 
-### POST /api/parking/exit
-Register a parking exit event.
+Records an entry event for a car using image processing.
+
+### Park Exit
+**Endpoint:** `POST /api/parking/exit`
+
+Records an exit event for a car using image processing.
 
 ## Parking
 
-### POST /api/parking/entry
-Register a parking entry event.
+### Park Entry
+**Endpoint:** `POST /api/parking/entry`
 
-### POST /api/parking/exit
-Register a parking exit event.
+Records an entry event for a car.
+
+### Park Exit
+**Endpoint:** `POST /api/parking/exit`
+
+Records an exit event for a car.
 
 ## Parking-Rate
 
-### GET /api/parking-rate/free-spaces
-Get the latest parking rate with available free spaces.
+### Get Latest Parking Rate With Free Spaces
+**Endpoint:** `GET /api/parking-rate/free-spaces`
 
-### POST /api/parking-rate/new-parking-rate
-Create a new parking rate.
+Retrieves the latest parking rate and the number of free parking spaces.
+
+### Create Rate
+**Endpoint:** `POST /api/parking-rate/new-parking-rate`
+
+Creates a new parking rate entry.
 
 ---
 
