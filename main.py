@@ -23,7 +23,7 @@ app.include_router(users.router, prefix='/api', tags=['Users'])
 app.include_router(admin.router, prefix='/api', tags=['Admin'])
 app.include_router(image.router, prefix='/api', tags=['Images'])
 app.include_router(parking.router, prefix='/api', tags=['Parking-Rate'])
-app.include_router(history.router, prefix='/api', tags=['History'])
+#app.include_router(history.router, prefix='/api', tags=['History'])
 
 
 @app.get("/api/healthchecker", tags=['Health checker'])

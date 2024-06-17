@@ -15,10 +15,6 @@ ParkSense-AI is a web application designed to automate the detection of vehicle 
 
 - [Technologies](#technologies)
 - [Basic functionality](#basic-functionality)
-  - [Authentication](#authentication)
-  - [Working with photos](#working-with-photos)
-  - [Comments](#comments)
-  - [Profile](#profile)
 - [Usage](#usage)
   - [Installation](#installation)
   - [Additional information](#additional-information)
@@ -48,105 +44,147 @@ ParkSense-AI is a web application designed to automate the detection of vehicle 
 
 ## Basic functionality
 
-### Authentication
+## Authentication
 
-**Endpoints:**
+### Signup
+**Endpoint:** `POST /api/auth/signup`
 
-```
-POST /api/auth/signup
-```
+Registers a new user.
 
-```
-POST /api/auth/login
-```
+### Login
+**Endpoint:** `POST /api/auth/login`
 
-```
-GET /api/auth/refresh_token
-```
+Authenticates a user and returns a token.
 
-```
-GET /api/auth/confirmed_email/{token}
-```
+### Refresh Token
+**Endpoint:** `GET /api/auth/refresh_token`
 
-```
-POST /api/auth/request_email
-```
+Refreshes the authentication token.
 
-The application uses JWT tokens for authentication. Users have three roles: regular user, moderator, and administrator.
+### Logout
+**Endpoint:** `POST /api/auth/logout`
 
-To implement different access levels (regular user, moderator, and administrator),
-FastAPI decorators are used to check the token and user role.
+Logs out the authenticated user.
 
-### Working with photos
+## Users
 
-**Users can perform various operations related to photos:**
+### Get Current User
+**Endpoint:** `GET /api/users/me`
 
-- Upload photos with descriptions.
-  ```
-  POST /api/images/upload_image
-  ```
-- Delete photos.
-  ```
-  DELETE /api/images/{picture_id}
-  ```
-- Edit photo descriptions.
-  ```
-  PATCH /api/images/{picture_id}
-  ```
-- Retrieve a photo by a unique link.
-  ```
-  GET /api/images/{picture_id}
-  ```
-- Add up to 5 tags per photo.
+Retrieves the profile of the currently authenticated user.
 
-- Apply basic photo transformations using
-  [Cloudinary services](https://cloudinary.com/documentation/image_transformations).
-  `  POST /api/transform/create_transform/{natural_photo_id}`
-- Generate links to transformed images for viewing as URL and QR-code. Links are stored on the server.
+### Update Profile
+**Endpoint:** `PATCH /api/users/me`
 
-With the help of [FastAPI decorators, described above](#authentication),
-administrators can perform all CRUD operations with user photos.
+Updates the profile of the currently authenticated user.
 
-### Comments
+### Get User Profile
+**Endpoint:** `GET /api/users/{username}`
 
-**Under each photo, there is a comment section. Users can:**
+Retrieves the profile of a user by their username.
 
-- Add and read comments to each other's photos.
-  ```
-  POST /api/comments/{image_id}
-  ```
-  ```
-  GET /api/comments/all/{image_id}
-  ```
-- Edit comment.
-  ```
-  PATCH /api/comments/{comment_id}
-  ```
-- Administrators and moderators [if you have the role](#authentication) can delete comments.
-  ```
-  DELETE /api/comments/{comment_id}
-  ```
+### Ban User
+**Endpoint:** `PATCH /api/users/admin/{username}/ban`
 
-### Profile
+Bans a user by their username (Admin only).
 
-**Endpoints for user profile:**
+### Get Cars By User
+**Endpoint:** `GET /api/users/cars/{user_id}`
 
-- See your profile.
-  ```
-  GET /api/users/me
-  ```
-- Change your avatar.
-  ```
-  PATCH /api/users/avatar
-  ```
-- See another user's profile.
+Retrieves all cars associated with a specific user.
 
-  ```
-  GET /api/users/{username}
-  ```
+### Get Car By Plate
+**Endpoint:** `GET /api/users/cars/{plate}`
 
-- Create a route for a user profile based on their unique username.
-  It returns all user information, including name, registration date, and the number of uploaded photos.
+Retrieves a car by its plate number.
+
+## Admin
+
+### Read Cars
+**Endpoint:** `GET /api/admin/cars`
+
+Retrieves a list of all cars (Admin only).
+
+### Create Car
+**Endpoint:** `POST /api/admin/cars`
+
+Creates a new car entry (Admin only).
+
+### Get Default Parking Rate
+**Endpoint:** `GET /api/admin/default-parking-rate`
+
+Retrieves the default parking rate.
+
+### Create Or Update Parking Rate
+**Endpoint:** `POST /api/admin/parking-rates`
+
+Creates or updates a parking rate (Admin only).
+
+### Read Parked Cars
+**Endpoint:** `GET /api/admin/cars/parked`
+
+Retrieves a list of all currently parked cars (Admin only).
+
+### Read Car
+**Endpoint:** `GET /api/admin/cars/{plate}`
+
+Retrieves a car by its plate number (Admin only).
+
+### Update Car
+**Endpoint:** `PATCH /api/admin/cars/{plate}`
+
+Updates a car entry by its plate number (Admin only).
+
+### Delete Car
+**Endpoint:** `DELETE /api/admin/cars/{plate}`
+
+Deletes a car entry by its plate number (Admin only).
+
+### Read Users By Car
+**Endpoint:** `GET /api/admin/users-by-car/{plate}`
+
+Retrieves a list of users associated with a specific car (Admin only).
+
+### Ban Car
+**Endpoint:** `PATCH /api/admin/cars/{plate}/ban`
+
+Bans a car by its plate number (Admin only).
+
+## Images
+
+### Park Entry
+**Endpoint:** `POST /api/parking/entry`
+
+Records an entry event for a car using image processing.
+
+### Park Exit
+**Endpoint:** `POST /api/parking/exit`
+
+Records an exit event for a car using image processing.
+
+## Parking
+
+### Park Entry
+**Endpoint:** `POST /api/parking/entry`
+
+Records an entry event for a car.
+
+### Park Exit
+**Endpoint:** `POST /api/parking/exit`
+
+Records an exit event for a car.
+
+## Parking-Rate
+
+### Get Latest Parking Rate With Free Spaces
+**Endpoint:** `GET /api/parking-rate/free-spaces`
+
+Retrieves the latest parking rate and the number of free parking spaces.
+
+### Create Rate
+**Endpoint:** `POST /api/parking-rate/new-parking-rate`
+
+Creates a new parking rate entry.
 
 ---
 
@@ -158,6 +196,12 @@ administrators can perform all CRUD operations with user photos.
 
 ```Shell
   git clone https://github.com/Sikan777/ParkSense-AI.git
+```
+
+- Run docker file.
+
+```Shell
+  docker run --name ParkSense-AI -p 5432:5432 -e POSTGRES_PASSWORD=pass -d postgres
 ```
 
 - Install dependencies.
@@ -173,8 +217,13 @@ _using poetry_
 ```Shell
   cp .env.example .env
 ```
+- We create a database in DBeaver with the appropriate name and password located in the .env file
 
-_and fill in the information you need, run the docker container and create the database if use Postgres _
+- Update migrations
+
+```Shell
+  alembic upgrade head
+```
 
 - Run the application.
 
@@ -182,7 +231,9 @@ _and fill in the information you need, run the docker container and create the d
   uvicorn main:app --reload
 ```
 
-- Enjoy using application via link in the terminal.
+- Access the API documentation at `http://127.0.0.1:8000/docs#/ after starting the development server.
+
+- Use the provided endpoints to manage users, cars, and parking rates.
 
 ---
 
