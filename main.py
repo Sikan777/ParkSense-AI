@@ -11,7 +11,7 @@ from sqlalchemy import text
 from src.services.telegram_sender import run_bot
 
 from src.database.db import get_db
-from src.routes import auth, users, history
+from src.routes import auth, users, history, image, parking, admin
 
 app = FastAPI(title="ParkSense AI", description="Welcome to ParkSense AI API",
               swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"})
@@ -23,11 +23,10 @@ app.mount("/static", StaticFiles(directory=directory), name="static")
 app.include_router(auth.router, prefix='/api', tags=['Authentication'])
 app.include_router(users.router, prefix='/api', tags=['Users'])
 
-# app.include_router(admin.router, prefix='/api', tags=['Admin'])
-# app.include_router(image.router, prefix='/api', tags=['Images'])
-
+app.include_router(admin.router, prefix='/api', tags=['Admin'])
+app.include_router(image.router, prefix='/api', tags=['Images'])
+app.include_router(parking.router, prefix='/api', tags=['Parking-Rate'])
 app.include_router(history.router, prefix='/api', tags=['History'])
-
 
 
 @app.get("/api/healthchecker", tags=['Health checker'])

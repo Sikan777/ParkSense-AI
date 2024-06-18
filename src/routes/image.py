@@ -30,7 +30,7 @@ async def park_entry(user: User = Depends(auth_service.get_current_user), photo:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="License plate not recognized and not entered manually")
 
-    img_url, cloudinary_public_id = await cloud_service.upload_picture(img_processed, 'Entry_photos')
+    img_url, cloudinary_public_id = await cloud_service.upload_image(img_processed, 'Entry_photos')
     logging.info(img_url)
 
     picture = await create_image(session, recognized_symbols or plate_number, img_url, cloudinary_public_id)
@@ -60,7 +60,7 @@ async def park_exit(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="License plate not recognized and not entered manually")
 
-    img_url, cloudinary_public_id = await cloud_service.upload_picture(img_processed, 'Exit_photos')
+    img_url, cloudinary_public_id = await cloud_service.upload_image(img_processed, 'Exit_photos')
 
     picture = await create_image(session, recognized_symbols or plate_number, img_url, cloudinary_public_id)
 

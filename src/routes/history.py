@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter
 
 from typing import List
@@ -15,20 +16,21 @@ from src.services.auth import auth_service
 from src.repository.car import CarRepository
 
 
+current_dir = os.getcwd()
 router = APIRouter(prefix="/history", tags=["History"])
 
 
-@router.get("/create_entry/{find_plate}/{picture_id}", response_model=HistoryUpdate)
-async def create_entry(find_plate, picture_id, session: AsyncSession = Depends(get_db)):
-    history = await repositories_history.create_entry(find_plate, picture_id, session)
+@router.get("/create_entry/{find_plate}/{image_id}", response_model=HistoryUpdate)
+async def create_entry(find_plate, image_id, session: AsyncSession = Depends(get_db)):
+    history = await repositories_history.create_entry(find_plate, image_id, session)
     if history is None:
         raise HTTPException(status_code=400, detail="Error creating entry car")
     return history
 
 
-@router.get("/create_exit/{find_plate}/{picture_id}", response_model=HistoryUpdate)
-async def create_exit(find_plate, picture_id, session: AsyncSession = Depends(get_db)):
-    history = await repositories_history.create_exit(find_plate, picture_id, session)
+@router.get("/create_exit/{find_plate}/{image_id}", response_model=HistoryUpdate)
+async def create_exit(find_plate, image_id, session: AsyncSession = Depends(get_db)):
+    history = await repositories_history.create_exit(find_plate, image_id, session)
     if history is None:
         raise HTTPException(status_code=400, detail="Error creating exit car")
     return history
@@ -94,7 +96,7 @@ async def get_history_entries_by_period_route(
         raise HTTPException(status_code=400, detail="Invalid date format. Please use YYYY-MM-DD")
 
     history_entries = await repositories_history.get_history_entries_by_period(start_datetime, end_datetime, session)
-    file_path = "backend/history_entries.csv"
+    file_path = os.path.join(current_dir, '../ParkSense-AI/history_entries.csv')
     await repositories_history.save_history_to_csv(history_entries, file_path)
     # return history_entries
     return FileResponse(file_path, filename="history_entries.csv", media_type="text/csv")
@@ -125,7 +127,7 @@ async def get_history_entries_for_car_by_period_route(
     history_entries = await repositories_history.get_history_entries_by_period_car(start_datetime, end_datetime, car_id,
                                                                                    session)
 
-    file_path = "backend/history_entries.csv"
+    file_path = os.path.join(current_dir, '../ParkSense-AI/history_entries.csv')
     await repositories_history.save_history_to_csv(history_entries, file_path)
     return FileResponse(file_path, filename="history_entries.csv", media_type="text/csv")
 

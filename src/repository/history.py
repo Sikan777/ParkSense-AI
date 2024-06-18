@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime, time, timedelta
 from typing import Sequence, Tuple
 from sqlalchemy import and_, desc, func, null, or_, select
@@ -9,8 +10,8 @@ from src.services.email_sender import send_email
 #Implementing entry time recording every time a license plate is detected
 async def create_entry(find_plate: str, image_id: int, session: AsyncSession) -> History:
     entry_time = datetime.now()
-    # number_free_spaces,rate_id = await update_parking_spaces(session)
-    # number_free_spaces -= 1
+    number_free_spaces, rate_id = await update_parking_spaces(session)
+    number_free_spaces -= 1
     
 
     car_repository = CarRepository(session)
@@ -21,7 +22,7 @@ async def create_entry(find_plate: str, image_id: int, session: AsyncSession) ->
     else:
 
         history_new = History(entry_time=entry_time, image_id=image_id,
-                              #number_free_spaces=number_free_spaces, rate_id=rate_id,
+                              number_free_spaces=number_free_spaces, rate_id=rate_id,
                       exit_time=None)
         session.add(history_new)
         await session.commit()
@@ -29,7 +30,7 @@ async def create_entry(find_plate: str, image_id: int, session: AsyncSession) ->
         return history_new
 
     history_new = History(entry_time=entry_time, car_id=car_id, image_id=image_id,
-                          #number_free_spaces=number_free_spaces, rate_id=rate_id,
+                          number_free_spaces=number_free_spaces, rate_id=rate_id,
                       exit_time=None)
     session.add(history_new)
     await session.commit()
@@ -39,9 +40,9 @@ async def create_entry(find_plate: str, image_id: int, session: AsyncSession) ->
 #Implementing exit time recording every time a license plate is detected
 async def create_exit(find_plate: str, image_id: int, session: AsyncSession):
     history_entries = await get_history_entries_with_null_exit_time(session)
-    # number_free_spaces, rate_id = await update_parking_spaces(session)
-    # number_free_spaces += 1
-    # rate_id=int(rate_id)
+    number_free_spaces, rate_id = await update_parking_spaces(session)
+    number_free_spaces += 1
+    rate_id=int(rate_id)
     image_id = int(image_id)
 
     exit_time = datetime.now()
@@ -52,8 +53,8 @@ async def create_exit(find_plate: str, image_id: int, session: AsyncSession):
             if history.car_id == car_row.id:
 
                 history.exit_time = exit_time
-                # history.number_free_spaces = number_free_spaces
-                # history.rate_id = rate_id
+                history.number_free_spaces = number_free_spaces
+                history.rate_id = rate_id
 
                 #to the calculation of the cost of parking (using parking rate values)(class ParkingRate from the module category)
                 rate_per_hour, rate_per_day = await get_parking_rates_for_date(history.entry_time, session)
@@ -212,7 +213,7 @@ async def get_latest_parking_rate_with_free_spaces(session: AsyncSession):
 
 async def update_car_history( plate: str, car_id: int, session: AsyncSession):
     statement = select(History).where(
-        and_(History.picture.has(find_plate=plate), History.car_id == null())
+        and_(History.image.has(current_plate=plate), History.car_id == null())
     )
     result = await session.execute(statement)
     history_entry = result.unique().scalars().first()
@@ -225,6 +226,41 @@ async def update_car_history( plate: str, car_id: int, session: AsyncSession):
     await session.commit()
     await session.refresh(history_entry)
     return history_entry
+
+
+def format_timedelta(td):
+    total_seconds = int(td.total_seconds())
+    days, remainder = divmod(total_seconds, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes = remainder // 60
+    return f"{days}d {hours}h {minutes}m"
+
+async def save_history_to_csv(history_entries: Sequence[History], file_path: str):
+    fieldnames = [
+        'entry_time',
+        'exit_time',
+        'parking_time',
+        'cost',
+        'paid',
+        'number_free_spaces',
+        'plate'
+    ]
+
+    with open(file_path, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        for entry in history_entries:
+            parking_duration = timedelta(hours=entry.parking_time) if entry.parking_time is not None else None
+            entry_dict = {
+                'entry_time': entry.entry_time.strftime('%Y-%m-%d %H:%M') if entry.entry_time else None,
+                'exit_time': entry.exit_time.strftime('%Y-%m-%d %H:%M') if entry.exit_time else None,
+                'parking_time': format_timedelta(parking_duration) if parking_duration else None,
+                'cost': f"{entry.cost:.2f}" if entry.cost is not None else None,
+                'paid': entry.paid,
+                'number_free_spaces': entry.number_free_spaces,
+                'plate': entry.car.plate
+            }
+            writer.writerow(entry_dict)
 
 
 ### Limits of parking expenses with notification
