@@ -1,3 +1,4 @@
+import asyncio
 import os
 from pathlib import Path
 import uvicorn
@@ -6,6 +7,8 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+
+from src.services.telegram_sender import run_bot
 
 from src.database.db import get_db
 from src.routes import auth, users, history
@@ -38,6 +41,12 @@ async def healthchecker(db: AsyncSession = Depends(get_db)):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error connecting to the database")
+
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(run_bot())
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level="info")
