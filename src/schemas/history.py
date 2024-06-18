@@ -14,7 +14,7 @@ class HistoryUpdate(BaseModel):
     cost: Optional[float]
     paid: Optional[bool]
     car_id: Optional[Union[int, str]]
-    picture_id: Optional[Union[int, str]]
+    image_id: Optional[Union[int, str]]
     number_free_spaces: Optional[int]
     rate_id: Optional[Union[int, str]]
 
@@ -39,7 +39,7 @@ class HistorySchema(BaseModel):
     cost: float
     paid: bool = Field(default=False, nullable=True)
     car_id: Union[UUID, int]
-    picture_id: Union[UUID, int]
+    image_id: Union[UUID, int]
     number_free_spaces: Optional[int]
     rate_id: Union[UUID, int]
 
