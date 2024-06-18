@@ -212,7 +212,7 @@ async def get_latest_parking_rate_with_free_spaces(session: AsyncSession):
 
 async def update_car_history( plate: str, car_id: int, session: AsyncSession):
     statement = select(History).where(
-        and_(History.image.has(find_plate=plate), History.car_id == null())
+        and_(History.image.has(current_plate=plate), History.car_id == null())
     )
     result = await session.execute(statement)
     history_entry = result.unique().scalars().first()
