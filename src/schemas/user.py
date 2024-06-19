@@ -49,4 +49,4 @@ class TokenModel(BaseModel):
 
 class UserTelegram(BaseModel):
     email: str
-    chat_id: int
+    chat_id: str
