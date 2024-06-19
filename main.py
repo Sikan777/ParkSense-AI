@@ -7,6 +7,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.services.telegram_sender import run_bot
 
@@ -28,6 +29,15 @@ app.include_router(image.router, prefix='/api', tags=['Images'])
 app.include_router(parking.router, prefix='/api', tags=['Parking-Rate'])
 app.include_router(history.router, prefix='/api', tags=['History'])
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/healthchecker", tags=['Health checker'])
 async def healthchecker(db: AsyncSession = Depends(get_db)):
