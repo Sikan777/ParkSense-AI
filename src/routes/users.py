@@ -5,7 +5,7 @@ from src.database.db import get_db
 from src.entity.models import User, Role
 from src.repository.car import CarRepository
 from src.schemas.car import NewCarResponse
-from src.schemas.user import UserResponse, UserProfile, UserUpdate
+from src.schemas.user import UserResponse, UserProfile, UserUpdate, UserTelegram
 from src.services.auth import auth_service
 from src.repository import users as repositories_users
 
@@ -26,14 +26,19 @@ async def get_current_user(user: User = Depends(auth_service.get_current_user)):
 
 
 @router.get("/{username}", response_model=UserProfile)
-async def get_user_profile(userid: int, db: AsyncSession = Depends(get_db)):
+async def get_user_profile(userid: int, token: str = Depends(auth_service.oauth2_scheme),
+                           db: AsyncSession = Depends(get_db)):
     """
     The get_user_profile function returns a user profile based on the username provided.
 
     :param userid: str: Get the username from the path
+    :param token: str: Get the access token from the request
     :param db: AsyncSession: Pass the database session to the function
     :return: A user profile with the number of photos
     """
+    # Verify the token and get the current user
+    current_user = await auth_service.get_current_user(token, db)
+
     user_profile = await repositories_users.get_user_by_userid(userid, db)
 
     if not user_profile:
@@ -61,29 +66,26 @@ async def update_profile(user_update: UserUpdate, user: User = Depends(auth_serv
     return updated_user
 
 
-@router.patch("/admin/{username}/ban")
-async def ban_user(username: str, current_user: User = Depends(auth_service.get_current_user),
-                   db: AsyncSession = Depends(get_db)):
+@router.post("/ban_user/{user_id}")
+async def ban_user(user_id: int, token: str, db: AsyncSession = Depends(get_db)):
     """
-    The ban_user function ban a user by the admin.
+    The ban_user function updates the 'ban' attribute in the database.
 
-    :param username: Username of the user to be banned.
-    :type username: str
-    :param current_user: Current authenticated user (dependency injection).
-    :type current_user: User
-    :param db: Asynchronous SQLAlchemy session (dependency injection).
-    :type db: AsyncSession
-    :raises HTTPException: If the current user is not an admin or if the user to be banned is not found.
-    :return: A message indicating the success of the operation.
-    :rtype: dict
+    username: Username of the user to be banned.
+    username: str
+    db: Asynchronous SQLAlchemy session (dependency injection).
+    db: AsyncSession
+    :return: True if the user is successfully banned, False otherwise.
+    :rtype: bool
     """
-    if not current_user.role == Role.admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
+    user = await repositories_users.get_user_by_userid(user_id, db)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-    banned = await repositories_users.ban_user(username, db)
-    if not banned:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
-    return {"message": f"{username} has been banned."}
+    user.ban = True
+    await db.commit()
+    await auth_service.add_token_to_blacklist(user_id, token, db)
+    return {"msg": "User has been banned"}
 
 
 @router.get("/cars/{user_id}", response_model=list[NewCarResponse], status_code=status.HTTP_200_OK)
@@ -108,6 +110,7 @@ async def get_cars_by_user(user_id: int, db: AsyncSession = Depends(get_db),
     cars = await car_repository.get_cars_by_user(user_id)
     return cars
 
+
 @router.get("/cars/{plate}", response_model=NewCarResponse, status_code=status.HTTP_200_OK)
 async def get_car_by_plate(plate: str, db: AsyncSession = Depends(get_db),
                            admin: User = Depends(auth_service.get_current_admin)):
@@ -118,3 +121,13 @@ async def get_car_by_plate(plate: str, db: AsyncSession = Depends(get_db),
     if car is None:
         raise HTTPException(status_code=404, detail="Car not found")
     return car
+
+
+@router.post("/bind_chat_id", status_code=status.HTTP_200_OK)
+async def bind_chat_id(request: UserTelegram, db: AsyncSession = Depends(get_db)):
+    user = await repositories_users.get_user_by_email(request.email, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    user.chat_id = request.chat_id
+    await db.commit()
+    return {"message": "Chat ID bound successfully"}

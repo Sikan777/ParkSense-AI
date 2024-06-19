@@ -40,6 +40,7 @@ class User(JoinTime, Base):
     role: Mapped[Enum] = mapped_column('role', Enum(Role), default=Role.user, nullable=True)
     ban: Mapped[bool] = mapped_column(default=False, nullable=True)
     parking_expenses_limit: Mapped[float] = mapped_column(Float, nullable=False, default=1000.0)  # Limits of parking expenses 
+    chat_id: Mapped[str] = mapped_column(String(150), unique=True, nullable=True)
     blacklist_tokens: Mapped["Blacklist"] = relationship(
         "Blacklist", back_populates="user", lazy="joined", uselist=True
     )
