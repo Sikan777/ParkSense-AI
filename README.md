@@ -1,9 +1,5 @@
 # ParkSense-AI 
 
-<p align="center">
-  <img src="http://res.cloudinary.com/dyhtnkitj/image/upload/v1709056165/ImageHubProjectDB/user_1/original_images/ttu63ajzijfgp7ydjinm.jpg"
-  alt="ImageHub" width="256" height="256">
-</p>
 
 ---
 
@@ -242,6 +238,7 @@ _using poetry_
 
 - [Swagger documentation](http://127.0.0.1:8000/docs#)
 - [GitHub](https://github.com/Sikan777/ParkSense-AI.git)
+- [Prezentation](https://www.canva.com/design/DAGIZD7T0Qc/OmFtbHDnEqkxa7iMxOARPw/view?utm_content=DAGIZD7T0Qc&utm_campaign=designshare&utm_medium=link&utm_source=editor#1)
 
 
 ---
