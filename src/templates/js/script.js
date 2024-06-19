@@ -128,11 +128,13 @@ document.addEventListener("DOMContentLoaded", function(){
 		let username = document.getElementById('username').value;
 		let email = document.getElementById('email').value;
 		let password = document.getElementById('password').value;
+		let phone_number = document.getElementById('phone_number').value;
 
 		let userData = {
 			username: username,
 			email: email,
-			password: password
+			password: password,
+			phone_number: phone_number
 		};
 
 		await fetch('http://localhost:8000/api/auth/signup', {
@@ -147,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function(){
 				// Обработка успешного ответа
 				console.log("Пользователь успешно зарегистрирован.");
 				alert("Registration successful!");
-				window.location.href = '../ParkSense-AI/src/templates/index.html'; // Перенаправление на страницу Home
+				window.location.href = 'index.html'; // Перенаправление на страницу Home
 			} else {
 				// Обработка ошибки
 				return response.json().then(errorData => {
