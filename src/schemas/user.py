@@ -48,5 +48,5 @@ class TokenModel(BaseModel):
 
 
 class UserTelegram(BaseModel):
-    username: str
-    chat_id: int
+    email: str
+    chat_id: str
