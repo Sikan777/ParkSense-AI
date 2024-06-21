@@ -9,6 +9,7 @@ from src.repository import users as repositories_users
 from src.schemas.user import UserModel, TokenModel, UserResponse
 from src.services.auth import auth_service
 from src.services.telegram_sender import run_bot
+from src.static.telebot_tokens import tokens 
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 get_refresh_token = HTTPBearer()
@@ -76,7 +77,16 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = 
     refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
     await repositories_users.update_token(user, refresh_token, db)
     
-    
+    link = None
+    for key, value in tokens.items():
+        if value == TOKEN:
+            link = f"t.me/{key}"
+            break
+
+    if link:
+        print(f"Link: {link}")
+    else:
+        print("No matching token found in tokens.")
     
     if not bot_started and TOKEN is not None:
         bot_task = asyncio.create_task(run_bot(TOKEN))

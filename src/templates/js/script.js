@@ -448,5 +448,20 @@ document.addEventListener("DOMContentLoaded", () => {
         // });
 });
 
+document.getElementById('telegram-icon').addEventListener('click', function(event) {
+  event.preventDefault();
+  document.getElementById('telegram-modal').style.display = 'flex';
+});
+
+document.getElementById('close-modal').addEventListener('click', function() {
+  document.getElementById('telegram-modal').style.display = 'none';
+});
+
+document.getElementById('telegram-modal').addEventListener('click', function(event) {
+  if (event.target === this) {
+    this.style.display = 'none';
+  }
+});
+
 
 
