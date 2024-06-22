@@ -1,3 +1,5 @@
+import random
+from typing import Optional
 from fastapi import Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,9 +8,10 @@ from src.database.db import get_db
 from src.entity.models import User, Role
 from src.schemas.user import UserModel, UserUpdate
 from src.services import auth
+from src.static.telebot_tokens import tokens
 
 
-async def create_user(body: UserModel, db: AsyncSession = Depends(get_db)):
+async def create_user(body: UserModel, telegram_token: Optional[str] = None, db: AsyncSession = Depends(get_db)):
     """
     The create_user function creates a new user in the database.
 
@@ -21,7 +24,7 @@ async def create_user(body: UserModel, db: AsyncSession = Depends(get_db)):
     if is_first_user:
         new_user = User(**body.model_dump(), role=Role.admin)
     else:
-        new_user = User(**body.model_dump())
+        new_user = User(**body.model_dump(), telegram_token=telegram_token)
 
     db.add(new_user)
     await db.commit()
@@ -29,7 +32,7 @@ async def create_user(body: UserModel, db: AsyncSession = Depends(get_db)):
     return new_user
 
 
-async def get_user_by_email(email: str, db: AsyncSession = Depends(get_db)):
+async def get_user_by_email(email: str, db: AsyncSession = Depends(get_db)) -> User:
     """
     The get_user_by_email function takes an email address and returns the user associated with that email.
         If no such user exists, it returns None.
@@ -137,3 +140,19 @@ async def ban_user(username: str, db: AsyncSession):
         return True
     else:
         return False
+    
+    
+async def get_random_token(session: AsyncSession) -> str:
+    available_tokens = list(tokens.values())
+    
+    while available_tokens:
+        random_token = random.choice(available_tokens)
+        # Check if the token is already assigned to a user
+        result = await session.execute(select(User).filter(User.telegram_token == random_token))
+        user = result.scalars().first()
+        if not user:
+            return random_token
+        else:
+            available_tokens.remove(random_token)
+
+    raise ValueError("No available tokens found")

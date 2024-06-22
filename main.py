@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.services.telegram_sender import run_bot
+# from src.services.telegram_sender import run_bot
 
 from src.database.db import get_db
 from src.routes import auth, users, history, image, parking, admin
@@ -52,9 +52,9 @@ async def healthchecker(db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error connecting to the database")
 
 
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(run_bot())
+# @app.on_event("startup")
+# async def startup_event():
+#     asyncio.create_task(run_bot())
 
 
 if __name__ == "__main__":

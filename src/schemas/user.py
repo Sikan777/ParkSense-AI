@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -10,6 +11,7 @@ class UserModel(BaseModel):
     email: EmailStr
     password: str = Field(min_length=4, max_length=10)
     phone_number: str = Field(min_length=6, max_length=20)
+    
 
 
 class UserResponse(BaseModel):
@@ -19,6 +21,7 @@ class UserResponse(BaseModel):
     phone_number: str
     created_at: datetime
     role: Role
+    telegram_token: Optional[str] = None
 
     class Config:
         from_attributes = True

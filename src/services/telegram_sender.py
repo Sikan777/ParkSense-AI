@@ -9,12 +9,13 @@ from sqlalchemy.future import select
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
+
 # Initialize logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 # Telegram bot token from BotFather
-TOKEN = '6636168921:AAGQu67Jb9zXtGHkJEtw2qWNs6QTSkg6OB0'  # Replace with your bot's token
+TOKEN = '7487844433:AAFG1-yZSPdPRr3vWB9Leh23IPh_4XRupaY'  # Replace with your bot's token
 
 # Global variable for the chat ID, updated when /start is called
 CHAT_ID = None
@@ -104,6 +105,8 @@ async def periodic_check(application):
         except Exception as e:
             logging.error(f"Error in periodic_check: {e}")
             break
+        
+        
 async def main():
     # Create the Application and pass it your bot's token.
     application = ApplicationBuilder().token(TOKEN).build()
@@ -135,8 +138,8 @@ async def main():
     work for main.py
     
     """
-async def run_bot():
-    application = ApplicationBuilder().token(TOKEN).build()
+async def run_bot(token: str):
+    application = ApplicationBuilder().token(token).build()
 
     # Register the start command handler
     application.add_handler(CommandHandler("start", start))

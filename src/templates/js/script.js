@@ -17,11 +17,11 @@ document.querySelector('#search-btn').onclick = () =>{
 
 
 // document.querySelector('#cart-btn').onclick = () =>{
-	// shoppingCart.classList.toggle('active');
-	// searchForm.classList.remove('active');
-	// loginForm.classList.remove('active');
-	// signupForm.classList.remove('active');
-	// navbar.classList.remove('active');
+// shoppingCart.classList.toggle('active');
+// searchForm.classList.remove('active');
+// loginForm.classList.remove('active');
+// signupForm.classList.remove('active');
+// navbar.classList.remove('active');
 // }
 
 
@@ -80,15 +80,15 @@ var swiper = new Swiper(".product-slider", {
 	},
 	centeredSlides: true,
 	breakpoints: {
-	  0: {
-		slidesPerView: 1,
-	  },
-	  768: {
-		slidesPerView: 2,
-	  },
-	  1020: {
-		slidesPerView: 3,
-	  },
+		0: {
+			slidesPerView: 1,
+		},
+		768: {
+			slidesPerView: 2,
+		},
+		1020: {
+			slidesPerView: 3,
+		},
 	},
 });
 
@@ -101,15 +101,15 @@ var swiper = new Swiper(".review-slider", {
 	},
 	centeredSlides: true,
 	breakpoints: {
-	  0: {
-		slidesPerView: 1,
-	  },
-	  768: {
-		slidesPerView: 2,
-	  },
-	  1020: {
-		slidesPerView: 3,
-	  },
+		0: {
+			slidesPerView: 1,
+		},
+		768: {
+			slidesPerView: 2,
+		},
+		1020: {
+			slidesPerView: 3,
+		},
 	},
 });
 
@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function(){
 	createAccountLink.onclick = () =>{
 		signupForm.classList.toggle('active');
 	}
-
+	
 	signupForm.onsubmit = async (e) => {
 		e.preventDefault();
 		
@@ -129,14 +129,14 @@ document.addEventListener("DOMContentLoaded", function(){
 		let email = document.getElementById('email').value;
 		let password = document.getElementById('password').value;
 		let phone_number = document.getElementById('phone_number').value;
-
+		
 		let userData = {
 			username: username,
 			email: email,
 			password: password,
 			phone_number: phone_number
 		};
-
+		
 		await fetch('http://localhost:8000/api/auth/signup', {
 			method: 'POST',
 			headers: {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function(){
 				console.log("Пользователь успешно зарегистрирован.");
 				alert("Registration successful!");
 				window.location.href = 'index.html'; // Перенаправление на страницу Home
-			} else {
+				} else {
 				// Обработка ошибки
 				return response.json().then(errorData => {
 					console.error('Ошибка:', errorData.detail);
@@ -170,9 +170,9 @@ document.addEventListener("DOMContentLoaded", function(){
 		const formDataJSON = Object.fromEntries(formData.entries());
 		// const formData = new URLSearchParams();
 		// for (const key in formDataJSON) {
-			// formData.append(key, formDataJSON[key]);
+		// formData.append(key, formDataJSON[key]);
 		// }
-
+		
 		try {
 			const response = await fetch('http://localhost:8000/api/auth/login', {
 				method: 'POST',
@@ -184,46 +184,57 @@ document.addEventListener("DOMContentLoaded", function(){
 				// 'Content-Type': 'application/json'
 				// },
 			});
-
+			
 			if (response.ok) {
 				const data = await response.json();
 				console.log(data); // Вывод ответа сервера
 				access_token = data.access_token;
 				console.log("Access Token:", access_token);
+				console.log("Link Telegram:", data.link_telebot);
+				
+				
+				
 				// Скрыть форму login
 				document.getElementById('login-form').style.display = 'none';
 				// Скрыть кнопки login и signup
 				document.getElementById('login-btn').style.display = 'none';
 				document.getElementById('signup-btn').style.display = 'none';
 				
-		
+				
 				// Показать кнопку logout
 				document.getElementById('logout-btn').style.display = 'inline-block';
 				const usernameElement = document.getElementById('username-data');
 				usernameElement.innerText = formData.get('username')
-;
+				;
+				
+				
+				const telegramIcon = document.getElementById("telegram-icon");
+				const linkT = data.link_telebot;  // Переменная link из Python передаётся в шаблон HTML
+				telegramIcon.href = linkT;
+				console.log(linkT)
+				
 				// window.location.href = 'http://localhost:8000/docs'; // Перенаправление на страницу Home
-			} else {
+				} else {
 				const errorData = await response.json();
 				console.error(errorData); // Вывод ошибки
 			}
-		} catch (error) {
+			} catch (error) {
 			console.error('Error:', error);
 		}
 	});
-
+	
 	// // /logout
 	// Проверяем, есть ли сохраненная информация о входе пользователя в локальном хранилище
 	const accessToken = localStorage.getItem('access_token');
 	const refreshToken = localStorage.getItem('refresh_token');
 	const username = localStorage.getItem('username');
-
+	
 	if (accessToken && refreshToken && username) {
 		// Если есть информация о входе пользователя, скрываем форму входа и показываем кнопку с именем пользователя
 		document.getElementById('login-btn').style.display = 'none';
 		document.getElementById('logout-btn').style.display = 'inline-block';
 		document.getElementById('username-data').innerText = formData.get('username');
-
+		
 		// Обработчик события для формы logout
 		document.getElementById('logout-form').addEventListener('submit', async function(event) {
 			event.preventDefault();
@@ -246,11 +257,11 @@ document.addEventListener("DOMContentLoaded", function(){
 					document.getElementById('signup-btn').style.display = 'inline-block';
 					// Перезагружаем страницу после успешного выхода из системы
 					window.location.reload();
-				} else {
+					} else {
 					const data = await response.json();
 					console.error(data);
 				}
-			} catch (error) {
+				} catch (error) {
 				console.error('Error:', error);
 			}
 		});
@@ -259,194 +270,70 @@ document.addEventListener("DOMContentLoaded", function(){
 	
 })
 
-// document.addEventListener("DOMContentLoaded", () => {
-	
-    // const addPhotoBtn = document.getElementById("addPhotoBtn");
-    // const fileInput = document.getElementById("fileInput");
-    // const uploadedImagesSection = document.getElementById("uploadedImages");
-
-    // addPhotoBtn.addEventListener("click", () => {
-        // fileInput.click();
-    // });
-
-    // fileInput.addEventListener("change", async (event) => {
-		
-		// document.getElementById("uploadButton").addEventListener("click", async () => {
-			// event.preventDefault();
-			// //const fileInput = document.getElementById("fileInput");
-			// const photo = event.target.files[0];
-			// const descriptionInput = document.getElementById("description");
-			// const description = descriptionInput.value.trim();
-			
-			// // if (description === "") {
-            // // alert("Please enter image description.");
-            // // return;
-			// // }
-			
-			// console.log(description)
-			
-			// const formData = new FormData();
-			// formData.append("photo", photo);
-			// formData.append("description", description);
-			
-			// console.log(formData)
-			// //console.log(formData.get("description"));
-			// console.log(formData.get("photo"));
-			
-			// descriptionInput.value = "";
-			
-			// //const formDataJSON = Object.fromEntries(formData.entries());
-			
-
-			// try {
-				// const response = await fetch(`http://127.0.0.1:8000/api/parking/entry`, {
-					// method: 'POST',
-					// headers: {
-					// 'Authorization': `Bearer ${access_token}` // Включаем access token в заголовок Authorization
-					// //'Content-Type': 'multipart/form-data'
-					// },
-					// 'accept': 'application/json',
-					// body: formData
-					// //body: JSON.stringify(formDataJSON)
-				// });
-
-				// if (!response.ok) {
-					// throw new Error("Failed to upload image");
-				// }
-				// // else {
-					// // const data = await response.json();
-					// // return data.secure_url; // возвращает URL загруженного изображения
-				// // }
-				
-
-				// const imageData = await response.json();
-				// const imageUrl = imageData.image_url;
-				// console.log(imageData)
-				// console.log(imageUrl)
-
-				// // Create image element and append it to the uploaded images section
-				// const imageElement = document.createElement("img");
-				// imageElement.src = imageUrl;
-				// uploadedImagesSection.appendChild(imageElement);
-				// //document.getElementById("form").appendChild(description);
-			// } catch (error) {
-				// console.error("Error uploading image:", error);
-			// }
-		// });
-	// });
-// });
-
 document.addEventListener("DOMContentLoaded", () => {
     const addPhotoBtnEntry = document.getElementById("addPhotoBtnEntry");
     const fileInputEntry = document.getElementById("fileInputEntry");
 	const addPhotoBtnExit = document.getElementById("addPhotoBtnExit");
     const fileInputExit = document.getElementById("fileInputExit");
     const uploadedImagesSection = document.getElementById("uploadedImages");
-
+	
     addPhotoBtnEntry.addEventListener("click", () => {
         fileInputEntry.click();
-    });
+	});
 	
 	addPhotoBtnExit.addEventListener("click", () => {
         fileInputExit.click();
-    });
+	});
 	
 	fileInputEntry.addEventListener("change", async (event) => {
         await handleUpload(event, 'http://127.0.0.1:8000/api/parking/entry');
-    });
-
+	});
+	
     fileInputExit.addEventListener("change", async (event) => {
         await handleUpload(event, 'http://127.0.0.1:8000/api/parking/exit');
-    });
+	});
 	
 	async function handleUpload(event, apiEndpoint) {
-	
+		
 		event.preventDefault();
-            const photo = event.target.files[0];
-            const descriptionInput = document.getElementById("description");
-            const description = descriptionInput.value.trim();
-
-            const formData = new FormData();
-            formData.append("photo", photo);
-            formData.append("description", description);
-
-            descriptionInput.value = "";
-
-            try {
-                const response = await fetch(apiEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${access_token}`
-                    },
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to upload image");
-                }
-
-                const imageData = await response.json();
-                const imageUrl = imageData.image_url;
-                console.log(imageData);
-                console.log(imageUrl);
-
-                const imageElement = document.createElement("img");
-                imageElement.src = imageUrl;
-                uploadedImagesSection.appendChild(imageElement);
+		const photo = event.target.files[0];
+		const descriptionInput = document.getElementById("description");
+		const description = descriptionInput.value.trim();
+		
+		const formData = new FormData();
+		formData.append("photo", photo);
+		formData.append("description", description);
+		
+		descriptionInput.value = "";
+		
+		try {
+			const response = await fetch(apiEndpoint, {
+				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${access_token}`
+				},
+				body: formData
+			});
+			
+			if (!response.ok) {
+				throw new Error("Failed to upload image");
+			}
+			
+			const imageData = await response.json();
+			const imageUrl = imageData.image_url;
+			console.log(imageData);
+			console.log(imageUrl);
+			
+			const imageElement = document.createElement("img");
+			imageElement.src = imageUrl;
+			uploadedImagesSection.appendChild(imageElement);
             } catch (error) {
-                console.error("Error uploading image:", error);
-            }
+			console.error("Error uploading image:", error);
+		}
 	};
-
-    // fileInput.addEventListener("change", async (event) => {
-        // const uploadPhoto = async (apiEndpoint) => {
-            // event.preventDefault();
-            // const photo = event.target.files[0];
-            // const descriptionInput = document.getElementById("description");
-            // const description = descriptionInput.value.trim();
-
-            // const formData = new FormData();
-            // formData.append("photo", photo);
-            // formData.append("description", description);
-
-            // descriptionInput.value = "";
-
-            // try {
-                // const response = await fetch(apiEndpoint, {
-                    // method: 'POST',
-                    // headers: {
-                        // 'Authorization': `Bearer ${access_token}`
-                    // },
-                    // body: formData
-                // });
-
-                // if (!response.ok) {
-                    // throw new Error("Failed to upload image");
-                // }
-
-                // const imageData = await response.json();
-                // const imageUrl = imageData.image_url;
-                // console.log(imageData);
-                // console.log(imageUrl);
-
-                // const imageElement = document.createElement("img");
-                // imageElement.src = imageUrl;
-                // uploadedImagesSection.appendChild(imageElement);
-            // } catch (error) {
-                // console.error("Error uploading image:", error);
-            // }
-        // };
-
-        // // Загрузка фото для входа
-        // document.getElementById("uploadButtonEntry").addEventListener("click", async () => {
-            // await uploadPhoto('http://127.0.0.1:8000/api/parking/entry');
-        // });
-
-        // // Загрузка фото для выхода
-        // document.getElementById("uploadButtonExit").addEventListener("click", async () => {
-            // await uploadPhoto('http://127.0.0.1:8000/api/parking/exit');
-        // });
+	
 });
+
 
 
 

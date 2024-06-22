@@ -40,7 +40,11 @@ class User(JoinTime, Base):
     role: Mapped[Enum] = mapped_column('role', Enum(Role), default=Role.user, nullable=True)
     ban: Mapped[bool] = mapped_column(default=False, nullable=True)
     parking_expenses_limit: Mapped[float] = mapped_column(Float, nullable=False, default=1000.0)  # Limits of parking expenses 
-    chat_id: Mapped[str] = mapped_column(String(150), unique=True, nullable=True)
+    telegram_token: Mapped[str] = mapped_column(String(150), unique=True, nullable=True)
+    # telegram_token_id: Mapped[int] = mapped_column(Integer, ForeignKey("tokens.id"))
+    # telegram_token: Mapped[str] = relationship("Token", back_populates="user")
+    chat_id: Mapped[str] = mapped_column(String(150), unique=False, nullable=True)
+    
     blacklist_tokens: Mapped["Blacklist"] = relationship(
         "Blacklist", back_populates="user", lazy="joined", uselist=True
     )
@@ -48,6 +52,14 @@ class User(JoinTime, Base):
         secondary=user_car_association, back_populates="users", lazy="joined"
     )
 
+# class Token(Base):
+#     __tablename__ = "tokens"
+    
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+#     token_value: Mapped[str] = mapped_column(String(150), unique=True, nullable=True)
+    
+#     # Связь с пользователем
+#     user: Mapped[User] = relationship("User", back_populates="telegram_token")
 
 class Blacklist(JoinTime, Base):
     __tablename__ = "blacklist"
