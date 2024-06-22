@@ -1,7 +1,9 @@
 import asyncio
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
+from fastapi.responses import JSONResponse
 
 from src.database.db import get_db
 from src.entity.models import Role, User
@@ -9,8 +11,12 @@ from src.repository import users as repositories_users
 from src.schemas.user import UserModel, TokenModel, UserResponse
 from src.services.auth import auth_service
 from src.services.telegram_sender import run_bot
-from src.static.telebot_tokens import tokens 
+from src.static.telebot_tokens import tokens
 
+from flask import Flask, render_template 
+#https://www.youtube.com/watch?v=CJ3XiQgjNE8
+
+# app = Flask(__name__)
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 get_refresh_token = HTTPBearer()
 
@@ -48,7 +54,7 @@ async def signup(body: UserModel, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenModel)
-async def login(body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+async def login(request: Request, body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     """
     The login function is used to authenticate a user.
         It takes in the username and password of the user, and returns an access token if successful.
@@ -80,7 +86,7 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = 
     link = None
     for key, value in tokens.items():
         if value == TOKEN:
-            link = f"t.me/{key}"
+            link = f"http://t.me/{key}"
             break
 
     if link:
@@ -92,7 +98,8 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = 
         bot_task = asyncio.create_task(run_bot(TOKEN))
         bot_started = True
     
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+    #return templates.TemplateResponse("index.html", {"request": request, "link": link, "access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"})
+    return JSONResponse(content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer", "link_telebot": link})
 
 
 @router.get('/refresh_token', response_model=TokenModel)
@@ -135,3 +142,6 @@ async def logout(user: User = Depends(auth_service.get_current_user), db: AsyncS
     await auth_service.add_token_to_blacklist(user.id, user.refresh_token, db)
 
     return {"message": "Logout successful."}
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
